@@ -6,6 +6,8 @@ export interface UpdateProfileRequest {
   phone?: string;
   departement?: string;
   avatar?: string;
+  dateNaissance?: string;
+  cvPath?: string;
 }
 
 export interface UserProfile {
@@ -20,6 +22,8 @@ export interface UserProfile {
   accountStatus: string;
   createdAt: string;
   updatedAt: string;
+  dateNaissance?: string;
+  cvPath?: string;
 }
 
 export const userService = {
@@ -48,6 +52,29 @@ export const userService = {
 
     if (!response.ok) {
       throw new Error('Erreur lors de l\'upload de l\'avatar');
+    }
+
+    const result = await response.json();
+    return result.data;
+  },
+
+  uploadCV: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = apiService.getToken();
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+
+    const response = await fetch(`${API_URL}/users/profile/cv`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Erreur lors de l\'upload du CV');
     }
 
     const result = await response.json();
